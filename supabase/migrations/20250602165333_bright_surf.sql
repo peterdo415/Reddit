@@ -1,28 +1,12 @@
 /*
   # Initial Schema Setup
-
-  1. Tables
-    - users: User accounts and profiles
-    - communities: Community/subreddit-like groups
-    - posts: User submitted content
-    - comments: Post comments with threading support
-    - votes: Post voting system
-    - user_communities: User community memberships
-    
-  2. Indexes
-    - Optimized indexes for search and sorting
-    - Full-text search for posts and communities
-    - Hot score calculation indexes
-    
-  3. Views
-    - post_hot_scores: Reddit-style hot ranking algorithm
-    
-  4. Security
-    - Row Level Security (RLS) enabled on all tables
-    - Appropriate policies for public/authenticated access
+  …
 */
 
--- Users table
+-- 0) pgcrypto 拡張を有効化してから UUID 関連を使う
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- 1) Users table
 CREATE TABLE users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT UNIQUE NOT NULL,
@@ -48,7 +32,7 @@ CREATE POLICY "Users can update own profile"
   TO authenticated
   USING (auth.uid() = id);
 
--- Communities table
+-- 2) Communities table
 CREATE TABLE communities (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
@@ -79,7 +63,7 @@ CREATE POLICY "Communities can be updated by their creator"
   TO authenticated
   USING (auth.uid() = user_id);
 
--- Posts table
+-- 3) Posts table
 CREATE TABLE posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
@@ -113,7 +97,7 @@ CREATE POLICY "Posts can be updated by their author"
   TO authenticated
   USING (auth.uid() = user_id);
 
--- Comments table
+-- 4) Comments table
 CREATE TABLE comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
@@ -144,7 +128,7 @@ CREATE POLICY "Comments can be updated by their author"
   TO authenticated
   USING (auth.uid() = user_id);
 
--- Votes table
+-- 5) Votes table
 CREATE TABLE votes (
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
@@ -176,7 +160,7 @@ CREATE POLICY "Votes can be deleted by their creator"
   TO authenticated
   USING (auth.uid() = user_id);
 
--- User Communities table
+-- 6) User Communities table
 CREATE TABLE user_communities (
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   community_id INT REFERENCES communities(id) ON DELETE CASCADE,
@@ -196,19 +180,25 @@ CREATE POLICY "User communities can be managed by the user"
   TO authenticated
   USING (auth.uid() = user_id);
 
--- Create indexes
+-- 7) Create indexes
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_karma_score ON users(karma_score DESC);
 
 CREATE INDEX idx_communities_name ON communities(name);
-CREATE INDEX idx_communities_display_name ON communities USING gin(to_tsvector('japanese', display_name));
+-- ↓全文検索を'enable simple'に変更
+CREATE INDEX idx_communities_display_name 
+  ON communities 
+  USING gin(to_tsvector('simple', display_name));
 CREATE INDEX idx_communities_created_at ON communities(created_at DESC);
 
 CREATE INDEX idx_posts_community_created ON posts(community_id, created_at DESC);
 CREATE INDEX idx_posts_user_created ON posts(user_id, created_at DESC);
 CREATE INDEX idx_posts_hot_score ON posts((upvotes_count - downvotes_count) DESC, created_at DESC);
-CREATE INDEX idx_posts_search ON posts USING gin(to_tsvector('japanese', title || ' ' || COALESCE(body, '')));
+-- ↓全文検索を'enable simple'に変更
+CREATE INDEX idx_posts_search 
+  ON posts 
+  USING gin(to_tsvector('simple', title || ' ' || COALESCE(body, '')));
 CREATE INDEX idx_posts_promoted ON posts(is_promoted, created_at DESC);
 
 CREATE INDEX idx_comments_post_created ON comments(post_id, created_at DESC);
@@ -222,7 +212,7 @@ CREATE INDEX idx_votes_user_created ON votes(user_id, created_at DESC);
 CREATE INDEX idx_user_communities_user ON user_communities(user_id);
 CREATE INDEX idx_user_communities_community ON user_communities(community_id);
 
--- Create hot score view
+-- 8) Create hot score view
 CREATE VIEW post_hot_scores AS
 SELECT
   p.*,
