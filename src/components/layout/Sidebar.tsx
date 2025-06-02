@@ -1,0 +1,162 @@
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Home, Plus, RefreshCw, X, Menu } from 'lucide-react';
+import { useCommunityStore } from '../../stores/communityStore';
+import { useAuthStore } from '../../stores/authStore';
+
+const Sidebar: React.FC = () => {
+  const { communities, fetchCommunities, loading } = useCommunityStore();
+  const { user, initialized } = useAuthStore();
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  
+  useEffect(() => {
+    if (initialized && user) {
+      fetchCommunities();
+    }
+  }, [initialized, user, fetchCommunities]);
+
+  // Auto-collapse sidebar on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setIsOpen(false);
+      } else {
+        setIsOpen(true);
+      }
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+  // Close sidebar when clicking outside on mobile
+  const handleBackdropClick = () => {
+    if (window.innerWidth < 1024) {
+      setIsOpen(false);
+    }
+  };
+
+  // Close sidebar when clicking a link on mobile
+  const handleLinkClick = () => {
+    if (window.innerWidth < 1024) {
+      setIsOpen(false);
+    }
+  };
+
+  return (
+    <>
+      {/* ハンバーガーメニュー（モバイル） */}
+      <button
+        onClick={toggleSidebar}
+        className="lg:hidden fixed top-0 left-0 z-50 h-14 px-4 flex items-center text-gray-600 hover:text-gray-900"
+      >
+        {isOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* モバイル用バックドロップ */}
+      {isOpen && window.innerWidth < 1024 && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={handleBackdropClick}
+        ></div>
+      )}
+
+      {/* サイドバー */}
+      <aside 
+        className={`fixed lg:static top-0 left-0 w-64 h-full bg-white z-50 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        } mt-14 lg:mt-0`}
+      >
+        <div className="flex flex-col h-full p-4">
+          {/* ホームリンク */}
+          <Link 
+            to="/" 
+            className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md"
+            onClick={handleLinkClick}
+          >
+            <Home size={20} className="mr-2" />
+            <span>ホーム</span>
+          </Link>
+          
+          {/* コミュニティセクション */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase">コミュニティ</h3>
+              {loading ? (
+                <RefreshCw size={16} className="text-gray-400 animate-spin" />
+              ) : (
+                <button 
+                  onClick={() => fetchCommunities()}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <RefreshCw size={16} />
+                </button>
+              )}
+            </div>
+            
+            {/* コミュニティリスト */}
+            <div className="space-y-1">
+              {communities.length > 0 ? (
+                communities.map((community) => (
+                  <Link
+                    key={community.id}
+                    to={`/c/${community.name}`}
+                    className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                    onClick={handleLinkClick}
+                  >
+                    <div className="w-6 h-6 mr-2 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
+                      {community.image_url ? (
+                        <img 
+                          src={community.image_url} 
+                          alt={community.display_name} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold">
+                          {community.display_name.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <span className="truncate">{community.display_name}</span>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 p-2">
+                  {user ? 'コミュニティが選択されていません' : 'ログインしてコミュニティを選択してください'}
+                </p>
+              )}
+            </div>
+            
+            {/* コミュニティ追加ボタン */}
+            {user && (
+              <button
+                onClick={() => {
+                  navigate('/community-selection');
+                  handleLinkClick();
+                }}
+                className="flex items-center mt-4 p-2 text-[var(--primary)] hover:bg-gray-100 rounded-md w-full"
+              >
+                <Plus size={20} className="mr-2" />
+                <span>コミュニティを追加</span>
+              </button>
+            )}
+          </div>
+          
+          {/* フッター */}
+          <div className="mt-auto text-xs text-gray-500 pt-4">
+            <p>© {new Date().getFullYear()} Redditsu</p>
+            <p className="mt-1">今話題の投稿を見つけよう</p>
+          </div>
+        </div>
+      </aside>
+    </>
+  );
+};
+
+export default Sidebar;
