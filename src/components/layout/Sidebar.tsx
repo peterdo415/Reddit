@@ -50,14 +50,6 @@ const Sidebar: React.FC = () => {
         isSidebarOpen ? 'translate-x-48' : ''
       }`} />
 
-      {/* Backdrop */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 lg:hidden z-40"
-          onClick={closeSidebar}
-        />
-      )}
-
       {/* Sidebar */}
       <aside 
         className={`fixed top-14 left-0 w-48 h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
