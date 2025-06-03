@@ -129,3 +129,12 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-secondary);
 }
+
+/* Sidebar transition */
+.sidebar-transition {
+  transition: transform 300ms ease-in-out;
+}
+
+.content-transition {
+  transition: margin-left 300ms ease-in-out;
+}
