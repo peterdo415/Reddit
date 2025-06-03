@@ -52,7 +52,7 @@ const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed top-14 left-0 w-48 h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
+        className={`fixed top-14 left-0 w-48 h-[calc(100vh-3.5rem)] bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -60,7 +60,7 @@ const Sidebar: React.FC = () => {
           {/* Home Link */}
           <Link 
             to="/" 
-            className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md"
+            className="flex items-center p-2 text-gray-700 hover:bg-white rounded-md"
             onClick={closeSidebar}
           >
             <Home size={20} className="mr-2" />
@@ -90,7 +90,7 @@ const Sidebar: React.FC = () => {
                   <Link
                     key={community.id}
                     to={`/c/${community.name}`}
-                    className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                    className="flex items-center p-2 text-gray-700 hover:bg-white rounded-md"
                     onClick={closeSidebar}
                   >
                     <div className="w-6 h-6 mr-2 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
@@ -123,7 +123,7 @@ const Sidebar: React.FC = () => {
                   navigate('/community-selection');
                   closeSidebar();
                 }}
-                className="flex items-center mt-4 p-2 text-[var(--primary)] hover:bg-gray-100 rounded-md w-full"
+                className="flex items-center mt-4 p-2 text-[var(--primary)] hover:bg-white rounded-md w-full"
               >
                 <Plus size={20} className="mr-2" />
                 <span>コミュニティを追加</span>
