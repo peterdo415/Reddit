@@ -129,3 +129,20 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-secondary);
 }
+
+/* Sidebar styles */
+.sidebar-menu-item {
+  @apply flex items-center p-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors;
+}
+
+.sidebar-menu-item.active {
+  @apply bg-gray-100;
+}
+
+.sidebar-section {
+  @apply mb-4 border-b border-gray-200 pb-2;
+}
+
+.sidebar-section-title {
+  @apply text-xs font-medium text-gray-500 uppercase px-2 mb-2;
+}
