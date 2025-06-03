@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/authStore';
 
 interface RegisterFormValues {
   email: string;
+  username: string;
   password: string;
   confirmPassword: string;
 }
@@ -18,7 +19,7 @@ const RegisterPage: React.FC = () => {
   
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      await registerUser(data.email, data.password);
+      await registerUser(data.email, data.password, data.username);
       navigate('/community-selection');
     } catch (error) {
       console.error('Registration error:', error);
@@ -64,6 +65,35 @@ const RegisterPage: React.FC = () => {
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              ユーザー名
+            </label>
+            <input
+              id="username"
+              type="text"
+              {...register('username', {
+                required: 'ユーザー名は必須です',
+                minLength: {
+                  value: 3,
+                  message: 'ユーザー名は3文字以上必要です'
+                },
+                maxLength: {
+                  value: 20,
+                  message: 'ユーザー名は20文字以内にしてください'
+                },
+                pattern: {
+                  value: /^[a-zA-Z0-9_]+$/,
+                  message: 'ユーザー名は英数字とアンダースコアのみ使用できます'
+                }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+            />
+            {errors.username && (
+              <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
             )}
           </div>
           

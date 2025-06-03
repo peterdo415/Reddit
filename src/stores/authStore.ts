@@ -11,7 +11,7 @@ interface AuthState {
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
   setSelectedCommunities: (communityIds: number[]) => void;
 }
@@ -116,19 +116,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  register: async (email: string, password: string) => {
+  register: async (email: string, password: string, username: string) => {
     try {
       set({ loading: true, error: null });
       
+      // Check if username is already taken
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', username)
+        .single();
+        
+      if (existingUser) {
+        throw new Error('このユーザー名は既に使用されています');
+      }
+      
+      // Register user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          data: {
+            username
+          },
           emailRedirectTo: `${window.location.origin}/community-selection`
         }
       });
       
       if (error) throw error;
+      
+      // Create user profile
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            username: username
+          });
+          
+        if (profileError) throw profileError;
+      }
+      
       set({ user: data.user });
       
     } catch (error: any) {
