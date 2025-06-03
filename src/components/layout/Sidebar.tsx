@@ -1,15 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Plus, RefreshCw } from 'lucide-react';
+import { Home, Plus, RefreshCw, X, Menu } from 'lucide-react';
 import { useCommunityStore } from '../../stores/communityStore';
 import { useAuthStore } from '../../stores/authStore';
-import { useSidebarUiStore } from '../../stores/sidebarUiStore';
 
 const Sidebar: React.FC = () => {
   const { communities, fetchCommunities, loading } = useCommunityStore();
   const { user, initialized } = useAuthStore();
-  const { isOpen, close } = useSidebarUiStore();
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
   
   useEffect(() => {
     if (initialized && user) {
@@ -17,34 +16,49 @@ const Sidebar: React.FC = () => {
     }
   }, [initialized, user, fetchCommunities]);
 
+  // Auto-collapse sidebar on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setIsOpen(false);
+      } else {
+        setIsOpen(true);
+      }
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
   // Close sidebar when clicking outside on mobile
   const handleBackdropClick = () => {
     if (window.innerWidth < 1024) {
-      close();
+      setIsOpen(false);
     }
   };
 
   // Close sidebar when clicking a link on mobile
   const handleLinkClick = () => {
     if (window.innerWidth < 1024) {
-      close();
+      setIsOpen(false);
     }
   };
 
-  // Close sidebar on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        close();
-      }
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [close]);
-
   return (
     <>
+      {/* ハンバーガーメニュー（モバイル） */}
+      <button
+        onClick={toggleSidebar}
+        className="lg:hidden fixed top-0 left-0 z-50 h-14 px-4 flex items-center text-gray-600 hover:text-gray-900"
+      >
+        {isOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
       {/* モバイル用バックドロップ */}
       {isOpen && window.innerWidth < 1024 && (
         <div 
@@ -57,7 +71,7 @@ const Sidebar: React.FC = () => {
       <aside 
         className={`fixed lg:static top-0 left-0 w-64 h-full bg-white z-50 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        } pt-14 lg:pt-0`}
+        } mt-14 lg:mt-0`}
       >
         <div className="flex flex-col h-full p-4">
           {/* ホームリンク */}
