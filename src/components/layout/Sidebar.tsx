@@ -45,6 +45,11 @@ const Sidebar: React.FC = () => {
         <Menu size={20} />
       </button>
 
+      {/* Vertical Line */}
+      <div className={`fixed left-6 top-14 h-[calc(100%-3.5rem)] border-l border-gray-200 lg:hidden transform transition-transform duration-300 ${
+        isSidebarOpen ? 'translate-x-48' : ''
+      }`} />
+
       {/* Sidebar */}
       <aside 
         className={`fixed top-14 left-0 w-48 h-[calc(100vh-3.5rem)] bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
