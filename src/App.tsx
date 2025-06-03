@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useSidebarStore } from './stores/sidebarStore';
 
 // Components
 import Header from './components/layout/Header';
@@ -23,6 +24,7 @@ import { useAuthStore } from './stores/authStore';
 
 function App() {
   const { user, initialized } = useAuthStore();
+  const { isOpen } = useSidebarStore();
 
   if (!initialized) {
     return (
@@ -38,7 +40,9 @@ function App() {
         <Header />
         <div className="flex flex-grow">
           <Sidebar />
-          <main className="flex-grow p-4">
+          <main className={`flex-grow p-4 transition-transform duration-300 ease-in-out ${
+            isOpen ? 'lg:ml-0 translate-x-64' : 'lg:ml-64 translate-x-0'
+          }`}>
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/post/:postId" element={<PostDetailPage />} />

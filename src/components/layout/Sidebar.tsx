@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Plus, RefreshCw, X, Menu } from 'lucide-react';
+import { Home, Plus, RefreshCw } from 'lucide-react';
 import { useCommunityStore } from '../../stores/communityStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useSidebarStore } from '../../stores/sidebarStore';
 
 const Sidebar: React.FC = () => {
   const { communities, fetchCommunities, loading } = useCommunityStore();
   const { user, initialized } = useAuthStore();
+  const { isOpen, close } = useSidebarStore();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
   
   useEffect(() => {
     if (initialized && user) {
@@ -16,65 +17,42 @@ const Sidebar: React.FC = () => {
     }
   }, [initialized, user, fetchCommunities]);
 
-  // Auto-collapse sidebar on mobile
+  // Close sidebar on window resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setIsOpen(false);
-      } else {
-        setIsOpen(true);
+      if (window.innerWidth >= 1024) {
+        close();
       }
     };
     
-    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [close]);
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  // Close sidebar when clicking outside on mobile
-  const handleBackdropClick = () => {
-    if (window.innerWidth < 1024) {
-      setIsOpen(false);
-    }
-  };
-
-  // Close sidebar when clicking a link on mobile
   const handleLinkClick = () => {
     if (window.innerWidth < 1024) {
-      setIsOpen(false);
+      close();
     }
   };
 
   return (
     <>
-      {/* ハンバーガーメニュー（モバイル） */}
-      <button
-        onClick={toggleSidebar}
-        className="lg:hidden fixed top-0 left-0 z-50 h-14 px-4 flex items-center text-gray-600 hover:text-gray-900"
-      >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
-
-      {/* モバイル用バックドロップ */}
-      {isOpen && window.innerWidth < 1024 && (
+      {/* Backdrop */}
+      {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={handleBackdropClick}
-        ></div>
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={close}
+        />
       )}
 
-      {/* サイドバー */}
+      {/* Sidebar */}
       <aside 
-        className={`fixed lg:static top-0 left-0 w-64 h-full bg-white z-50 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed lg:sticky top-0 left-0 h-full w-64 bg-white z-50 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        } mt-14 lg:mt-0`}
+        } pt-14 lg:pt-0`}
       >
         <div className="flex flex-col h-full p-4">
-          {/* ホームリンク */}
+          {/* Home Link */}
           <Link 
             to="/" 
             className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md"
@@ -84,7 +62,7 @@ const Sidebar: React.FC = () => {
             <span>ホーム</span>
           </Link>
           
-          {/* コミュニティセクション */}
+          {/* Communities Section */}
           <div className="mt-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold text-gray-500 uppercase">コミュニティ</h3>
@@ -100,7 +78,7 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             
-            {/* コミュニティリスト */}
+            {/* Communities List */}
             <div className="space-y-1">
               {communities.length > 0 ? (
                 communities.map((community) => (
@@ -133,7 +111,7 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             
-            {/* コミュニティ追加ボタン */}
+            {/* Add Community Button */}
             {user && (
               <button
                 onClick={() => {
@@ -148,7 +126,7 @@ const Sidebar: React.FC = () => {
             )}
           </div>
           
-          {/* フッター */}
+          {/* Footer */}
           <div className="mt-auto text-xs text-gray-500 pt-4">
             <p>© {new Date().getFullYear()} Redditsu</p>
             <p className="mt-1">今話題の投稿を見つけよう</p>
