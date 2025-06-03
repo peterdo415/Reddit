@@ -15,11 +15,11 @@ const FireEffect: React.FC = () => {
       
       // Random starting position
       const startX = Math.random() * containerRect.width;
-      const drift = (Math.random() - 0.5) * 100; // Random horizontal drift
-      const randomY = Math.random() * 50; // Random vertical variation
-      const rotation = Math.random() * 360; // Random rotation
-      const duration = 2 + Math.random() * 2; // Random duration between 2-4s
-      const maxOpacity = 0.3 + Math.random() * 0.5; // Random opacity
+      const drift = (Math.random() - 0.5) * 120; // Increased drift
+      const randomY = Math.random() * 60; // Increased vertical variation
+      const rotation = Math.random() * 360;
+      const duration = 1.5 + Math.random() * 1.5; // Faster animation
+      const maxOpacity = 0.5 + Math.random() * 0.5; // Higher opacity
       
       // Set custom properties
       particle.style.setProperty('--startX', `${startX}px`);
@@ -29,8 +29,8 @@ const FireEffect: React.FC = () => {
       particle.style.setProperty('--duration', `${duration}s`);
       particle.style.setProperty('--maxOpacity', maxOpacity.toString());
       
-      // Random size
-      const size = Math.random() * 4 + 2;
+      // Random size (increased)
+      const size = Math.random() * 6 + 3;
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
       
@@ -51,7 +51,7 @@ const FireEffect: React.FC = () => {
       sparkle.style.top = `${top}px`;
       
       // Random duration
-      const duration = 0.5 + Math.random() * 1;
+      const duration = 0.4 + Math.random() * 0.8; // Faster sparkles
       sparkle.style.setProperty('--duration', `${duration}s`);
       
       container.appendChild(sparkle);
@@ -60,19 +60,19 @@ const FireEffect: React.FC = () => {
       setTimeout(() => sparkle.remove(), duration * 1000 * 3);
     };
     
-    // Create initial particles
-    for (let i = 0; i < 15; i++) {
+    // Create more initial particles
+    for (let i = 0; i < 20; i++) {
       setTimeout(() => createParticle(), Math.random() * 2000);
     }
     
-    // Create initial sparkles
-    for (let i = 0; i < 5; i++) {
+    // Create more initial sparkles
+    for (let i = 0; i < 8; i++) {
       setTimeout(() => createSparkle(), Math.random() * 2000);
     }
     
-    // Continuous particle creation
-    const particleInterval = setInterval(createParticle, 200);
-    const sparkleInterval = setInterval(createSparkle, 500);
+    // Increased particle creation frequency
+    const particleInterval = setInterval(createParticle, 150);
+    const sparkleInterval = setInterval(createSparkle, 400);
     
     return () => {
       clearInterval(particleInterval);
