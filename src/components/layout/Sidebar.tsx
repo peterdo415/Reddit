@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Plus, RefreshCw, Menu, X } from 'lucide-react';
+import { Home, Plus, RefreshCw, Menu } from 'lucide-react';
 import { useCommunityStore } from '../../stores/communityStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useUiStore } from '../../stores/uiStore';
@@ -42,7 +42,7 @@ const Sidebar: React.FC = () => {
         }`}
         aria-label={isSidebarOpen ? 'サイドバーを閉じる' : 'サイドバーを開く'}
       >
-        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        <Menu size={20} />
       </button>
 
       {/* Vertical Line */}
