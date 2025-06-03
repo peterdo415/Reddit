@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
-import { ArrowBigUp, ArrowBigDown, MessageSquare, Flame, MoreVertical } from 'lucide-react';
+import { ArrowBigUp, ArrowBigDown, MessageSquare, Flame } from 'lucide-react';
 import { Post } from '../../lib/supabase';
 import { usePostStore } from '../../stores/postStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -16,8 +16,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
   const { upvotePost, downvotePost } = usePostStore();
   const { user } = useAuthStore();
   const [vote, setVote] = useState<number>(0);
-  const [showMenu, setShowMenu] = useState(false);
   
+  // Get user's vote for this post
   useEffect(() => {
     const fetchVote = async () => {
       if (!user) return;
@@ -62,15 +62,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
     downvotePost(post.id);
     setVote(vote === -1 ? 0 : -1);
   };
-
-  const handleMenuClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowMenu(!showMenu);
-  };
   
+  // Check if this post should have fire effect (top 3 posts)
   const showFireEffect = index < 3 && !post.is_promoted;
   
+  // Format relative time
   const formattedTime = formatDistance(
     new Date(post.created_at),
     new Date(),
@@ -80,7 +76,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
   return (
     <Link
       to={`/post/${post.id}`}
-      className={`block mb-3 relative ${showFireEffect ? 'fire-effect rounded-lg' : 'bg-white rounded-lg shadow hover:shadow-md'} transition-all duration-200`}
+      className={`block mb-3 ${showFireEffect ? 'fire-effect rounded-lg' : 'bg-white rounded-lg shadow hover:shadow-md'} transition-all duration-200`}
     >
       {showFireEffect && <FireEffect />}
       
@@ -180,82 +176,20 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
           )}
           
           {/* Post footer */}
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <div className="flex items-center">
+          <div className="flex items-center text-sm text-gray-500">
+            <div className="flex items-center mr-4">
               <MessageSquare size={16} className="mr-1" />
               <span>{post.comments_count} コメント</span>
             </div>
             
-            {/* Menu button */}
-            <div className="relative">
-              <button
-                onClick={handleMenuClick}
-                className="p-2 hover:bg-gray-100 rounded-full"
-                aria-label="投稿メニュー"
-              >
-                <MoreVertical size={20} className="text-gray-500" />
-              </button>
-              
-              {showMenu && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-40"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShowMenu(false);
-                    }}
-                  />
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                    {user?.id === post.user_id && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          // TODO: 投稿編集機能
-                        }}
-                        className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      >
-                        編集
-                      </button>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        // TODO: 投稿共有機能
-                      }}
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      共有
-                    </button>
-                    {user?.id === post.user_id && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          // TODO: 投稿削除機能
-                        }}
-                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
-                      >
-                        削除
-                      </button>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
+            {post.is_promoted && (
+              <span className="text-xs font-medium bg-gray-200 px-2 py-0.5 rounded">
+                Promoted
+              </span>
+            )}
           </div>
         </div>
       </div>
-      
-      {post.is_promoted && (
-        <div className="absolute bottom-2 right-2">
-          <span className="text-xs font-medium bg-gray-200 px-2 py-0.5 rounded">
-            Promoted
-          </span>
-        </div>
-      )}
     </Link>
   );
 };
