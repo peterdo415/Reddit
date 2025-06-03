@@ -38,7 +38,7 @@ function App() {
         <Header />
         <div className="flex flex-grow">
           <Sidebar />
-          <main className="flex-grow p-4">
+          <main className="flex-grow p-4 lg:ml-64">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/post/:postId" element={<PostDetailPage />} />
