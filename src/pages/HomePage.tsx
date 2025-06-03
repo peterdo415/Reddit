@@ -11,13 +11,6 @@ const HomePage: React.FC = () => {
   const { fetchCommunities } = useCommunityStore();
   const navigate = useNavigate();
   
-  // Check if user needs to select communities
-  useEffect(() => {
-    if (user && selectedCommunities.length === 0) {
-      navigate('/community-selection');
-    }
-  }, [user, selectedCommunities, navigate]);
-  
   // Initial fetch
   useEffect(() => {
     fetchPosts(true);

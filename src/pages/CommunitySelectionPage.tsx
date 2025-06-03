@@ -57,12 +57,13 @@ const CommunitySelectionPage: React.FC = () => {
   };
   
   const handleSaveSelection = () => {
-    if (selectedIds.length === 0) {
-      setError('少なくとも1つのコミュニティを選択してください');
-      return;
-    }
-    
     setSelectedCommunities(selectedIds);
+    localStorage.removeItem('first_login');
+    navigate('/');
+  };
+  
+  const handleSkip = () => {
+    localStorage.removeItem('first_login');
     navigate('/');
   };
   
@@ -281,11 +282,18 @@ const CommunitySelectionPage: React.FC = () => {
         </div>
         
         {/* Save button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center space-x-4">
+          <button
+            onClick={handleSkip}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+            type="button"
+          >
+            スキップ
+          </button>
           <button
             onClick={handleSaveSelection}
-            className="px-6 py-2 bg-[var(--primary)] text-white rounded-md hover:bg-[var(--primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={selectedIds.length === 0}
+            className="px-6 py-2 bg-[var(--primary)] text-white rounded-md hover:bg-[var(--primary-hover)]"
+            type="button"
           >
             続ける ({selectedIds.length} 選択)
           </button>

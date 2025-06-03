@@ -20,6 +20,7 @@ const RegisterPage: React.FC = () => {
   const onSubmit = async (data: RegisterFormValues) => {
     try {
       await registerUser(data.email, data.password, data.username);
+      localStorage.setItem('first_login', 'true');
       navigate('/community-selection');
     } catch (error) {
       console.error('Registration error:', error);
