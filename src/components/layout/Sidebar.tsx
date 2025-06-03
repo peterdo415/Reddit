@@ -146,15 +146,6 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </aside>
-
-      {/* Main Content Wrapper */}
-      <div 
-        className={`min-h-screen transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'lg:ml-64 transform translate-x-64 lg:translate-x-0' : ''
-        }`}
-      >
-        {/* Content goes here */}
-      </div>
     </>
   );
 };
