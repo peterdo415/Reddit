@@ -18,6 +18,7 @@ import CommunitySelectionPage from './pages/CommunitySelectionPage';
 import CreatePostPage from './pages/CreatePostPage';
 import ProfilePage from './pages/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
+import CommunityCreatePage from './pages/CommunityCreatePage';
 
 // Hooks
 import { useAuthStore } from './stores/authStore';
@@ -57,6 +58,14 @@ function App() {
                     <CommunitySelectionPage />
                   </ProtectedRoute>
                 } 
+              />
+              <Route 
+                path="/community-create"
+                element={
+                  <ProtectedRoute>
+                    <CommunityCreatePage />
+                  </ProtectedRoute>
+                }
               />
               <Route 
                 path="/create-post" 

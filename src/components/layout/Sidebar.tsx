@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Plus, RefreshCw, Menu } from 'lucide-react';
+import { Home, Plus, RefreshCw, Menu, Search as SearchIcon } from 'lucide-react';
 import { useCommunityStore } from '../../stores/communityStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useUiStore } from '../../stores/uiStore';
@@ -83,6 +83,31 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             
+            {/* Community Actions */}
+            {user && (
+              <div className="flex flex-col space-y-2 mb-3">
+                <button
+                  onClick={() => {
+                    navigate('/community-selection');
+                    closeSidebar();
+                  }}
+                  className="w-full px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-medium flex items-center justify-center"
+                >
+                  <SearchIcon size={16} className="mr-1" />
+                  コミュニティを探す
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/community-create');
+                    closeSidebar();
+                  }}
+                  className="w-full px-2 py-1 rounded-md bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] text-xs font-medium"
+                >
+                  ＋追加
+                </button>
+              </div>
+            )}
+            
             {/* Communities List */}
             <div className="space-y-1">
               {communities.length > 0 ? (
@@ -115,20 +140,6 @@ const Sidebar: React.FC = () => {
                 </p>
               )}
             </div>
-            
-            {/* Add Community Button */}
-            {user && (
-              <button
-                onClick={() => {
-                  navigate('/community-selection');
-                  closeSidebar();
-                }}
-                className="flex items-center mt-4 p-2 text-[var(--primary)] hover:bg-white rounded-md w-full"
-              >
-                <Plus size={20} className="mr-2" />
-                <span>コミュニティを追加</span>
-              </button>
-            )}
           </div>
           
           {/* Footer */}
