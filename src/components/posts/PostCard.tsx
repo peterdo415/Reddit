@@ -94,33 +94,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
             <ArrowBigUp size={24} />
           </button>
           
-          <div className={`relative flex items-center my-1 ${
+          <span className={`text-sm font-medium my-1 ${
             vote === 1 
               ? 'text-[var(--upvote)]' 
               : vote === -1 
                 ? 'text-[var(--downvote)]' 
                 : 'text-gray-700'
           }`}>
-            <span className="text-sm font-medium">
-              {post.upvotes_count - post.downvotes_count}
-            </span>
-            {showFireEffect && (
-              <div className="absolute -right-6 animate-float">
-                <div className="relative">
-                  <Flame 
-                    size={16} 
-                    className="text-[var(--upvote)] animate-pulse-slow" 
-                  />
-                  <div className="absolute top-0 left-0 w-full h-full">
-                    <Flame 
-                      size={16} 
-                      className="text-[var(--upvote)] opacity-50 animate-pulse-reverse" 
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+            {post.upvotes_count - post.downvotes_count}
+          </span>
           
           <button 
             onClick={handleDownvote}
@@ -167,7 +149,25 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
           </div>
           
           {/* Post title */}
-          <h2 className="text-lg font-medium mb-2">{post.title}</h2>
+          <div className="flex items-center mb-2">
+            <h2 className="text-lg font-medium">{post.title}</h2>
+            {showFireEffect && (
+              <div className="ml-2 animate-float">
+                <div className="relative">
+                  <Flame 
+                    size={16} 
+                    className="text-[var(--upvote)] animate-pulse-slow" 
+                  />
+                  <div className="absolute top-0 left-0 w-full h-full">
+                    <Flame 
+                      size={16} 
+                      className="text-[var(--upvote)] opacity-50 animate-pulse-reverse" 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           
           {/* Post image (if exists) */}
           {post.image_url && (
