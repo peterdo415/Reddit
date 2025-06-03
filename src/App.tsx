@@ -41,8 +41,14 @@ function App() {
         <Header />
         <div className="flex flex-grow relative">
           <Sidebar />
+          {/* Overlay for mobile */}
+          <div 
+            className={`fixed inset-0 bg-black transition-opacity duration-300 lg:hidden ${
+              isSidebarOpen ? 'opacity-50 z-30' : 'opacity-0 pointer-events-none'
+            }`}
+          />
           <main className={`flex-grow p-4 transition-all duration-300 ease-in-out ${
-            isSidebarOpen ? 'lg:ml-64 transform translate-x-48 lg:translate-x-0' : ''
+            isSidebarOpen ? 'lg:ml-64 blur-sm lg:blur-none' : ''
           }`}>
             <Routes>
               <Route path="/" element={<HomePage />} />
