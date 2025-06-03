@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Plus, RefreshCw, X, Menu } from 'lucide-react';
+import { Home, Plus, RefreshCw, Menu } from 'lucide-react';
 import { useCommunityStore } from '../../stores/communityStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useUiStore } from '../../stores/uiStore';
 
 const Sidebar: React.FC = () => {
   const { communities, fetchCommunities, loading } = useCommunityStore();
   const { user, initialized } = useAuthStore();
+  const { isSidebarOpen, toggleSidebar, closeSidebar } = useUiStore();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
   
   useEffect(() => {
     if (initialized && user) {
@@ -16,75 +17,55 @@ const Sidebar: React.FC = () => {
     }
   }, [initialized, user, fetchCommunities]);
 
-  // Auto-collapse sidebar on mobile
+  // Close sidebar on route change
+  useEffect(() => {
+    closeSidebar();
+  }, [location.pathname, closeSidebar]);
+
+  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setIsOpen(false);
-      } else {
-        setIsOpen(true);
+      if (window.innerWidth >= 1024) {
+        closeSidebar();
       }
     };
     
-    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  // Close sidebar when clicking outside on mobile
-  const handleBackdropClick = () => {
-    if (window.innerWidth < 1024) {
-      setIsOpen(false);
-    }
-  };
-
-  // Close sidebar when clicking a link on mobile
-  const handleLinkClick = () => {
-    if (window.innerWidth < 1024) {
-      setIsOpen(false);
-    }
-  };
+  }, [closeSidebar]);
 
   return (
     <>
-      {/* ハンバーガーメニュー（モバイル） */}
+      {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="lg:hidden fixed top-0 left-0 z-50 h-14 px-4 flex items-center text-gray-600 hover:text-gray-900"
+        className="fixed left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 focus:outline-none lg:hidden z-50"
+        aria-label="サイドバーを開く"
       >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
+        <Menu size={20} />
       </button>
 
-      {/* モバイル用バックドロップ */}
-      {isOpen && window.innerWidth < 1024 && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={handleBackdropClick}
-        ></div>
-      )}
+      {/* Vertical Line */}
+      <div className="fixed left-8 top-0 h-full border-l border-gray-200 lg:hidden" />
 
-      {/* サイドバー */}
+      {/* Sidebar */}
       <aside 
-        className={`fixed lg:static top-0 left-0 w-64 h-full bg-white z-50 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        } mt-14 lg:mt-0`}
+        className={`fixed top-14 left-0 w-64 h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
         <div className="flex flex-col h-full p-4">
-          {/* ホームリンク */}
+          {/* Home Link */}
           <Link 
             to="/" 
             className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md"
-            onClick={handleLinkClick}
+            onClick={closeSidebar}
           >
             <Home size={20} className="mr-2" />
             <span>ホーム</span>
           </Link>
           
-          {/* コミュニティセクション */}
+          {/* Communities Section */}
           <div className="mt-6">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold text-gray-500 uppercase">コミュニティ</h3>
@@ -100,7 +81,7 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             
-            {/* コミュニティリスト */}
+            {/* Communities List */}
             <div className="space-y-1">
               {communities.length > 0 ? (
                 communities.map((community) => (
@@ -108,7 +89,7 @@ const Sidebar: React.FC = () => {
                     key={community.id}
                     to={`/c/${community.name}`}
                     className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md"
-                    onClick={handleLinkClick}
+                    onClick={closeSidebar}
                   >
                     <div className="w-6 h-6 mr-2 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
                       {community.image_url ? (
@@ -133,12 +114,12 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             
-            {/* コミュニティ追加ボタン */}
+            {/* Add Community Button */}
             {user && (
               <button
                 onClick={() => {
                   navigate('/community-selection');
-                  handleLinkClick();
+                  closeSidebar();
                 }}
                 className="flex items-center mt-4 p-2 text-[var(--primary)] hover:bg-gray-100 rounded-md w-full"
               >
@@ -148,13 +129,22 @@ const Sidebar: React.FC = () => {
             )}
           </div>
           
-          {/* フッター */}
+          {/* Footer */}
           <div className="mt-auto text-xs text-gray-500 pt-4">
             <p>© {new Date().getFullYear()} Redditsu</p>
             <p className="mt-1">今話題の投稿を見つけよう</p>
           </div>
         </div>
       </aside>
+
+      {/* Main Content Wrapper */}
+      <div 
+        className={`min-h-screen transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? 'lg:ml-64' : ''
+        }`}
+      >
+        {/* Content goes here */}
+      </div>
     </>
   );
 };
