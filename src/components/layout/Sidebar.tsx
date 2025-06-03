@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Plus, RefreshCw, Menu } from 'lucide-react';
+import { Home, Plus, RefreshCw, Menu, X } from 'lucide-react';
 import { useCommunityStore } from '../../stores/communityStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useUiStore } from '../../stores/uiStore';
@@ -34,6 +34,30 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
+      {/* Toggle Button */}
+      <button
+        onClick={toggleSidebar}
+        className={`fixed left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 focus:outline-none lg:hidden z-50 transform transition-transform duration-300 ${
+          isSidebarOpen ? 'translate-x-56' : ''
+        }`}
+        aria-label={isSidebarOpen ? 'サイドバーを閉じる' : 'サイドバーを開く'}
+      >
+        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Vertical Line */}
+      <div className={`fixed left-8 top-0 h-full border-l border-gray-200 lg:hidden transform transition-transform duration-300 ${
+        isSidebarOpen ? 'translate-x-56' : ''
+      }`} />
+
+      {/* Backdrop */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 lg:hidden z-40"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* Sidebar */}
       <aside 
         className={`fixed top-14 left-0 w-64 h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
@@ -42,23 +66,14 @@ const Sidebar: React.FC = () => {
       >
         <div className="flex flex-col h-full p-4">
           {/* Home Link */}
-          <div className="flex items-center">
-            <Link 
-              to="/" 
-              className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md flex-grow"
-              onClick={closeSidebar}
-            >
-              <Home size={20} className="mr-2" />
-              <span>ホーム</span>
-            </Link>
-            <button
-              onClick={toggleSidebar}
-              className="ml-2 w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-900 lg:hidden"
-              aria-label="サイドバーを切り替え"
-            >
-              <Menu size={24} />
-            </button>
-          </div>
+          <Link 
+            to="/" 
+            className="flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-md"
+            onClick={closeSidebar}
+          >
+            <Home size={20} className="mr-2" />
+            <span>ホーム</span>
+          </Link>
           
           {/* Communities Section */}
           <div className="mt-6">
@@ -133,13 +148,13 @@ const Sidebar: React.FC = () => {
       </aside>
 
       {/* Main Content Wrapper */}
-      <main 
+      <div 
         className={`min-h-screen transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'transform translate-x-64 lg:translate-x-0 lg:ml-64' : ''
+          isSidebarOpen ? 'lg:ml-64 transform translate-x-64 lg:translate-x-0' : ''
         }`}
       >
         {/* Content goes here */}
-      </main>
+      </div>
     </>
   );
 };

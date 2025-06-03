@@ -130,9 +130,11 @@
   background-color: var(--text-secondary);
 }
 
-/* Transitions */
-.transform-gpu {
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  perspective: 1000px;
+/* Sidebar transition */
+.sidebar-transition {
+  transition: transform 300ms ease-in-out;
+}
+
+.content-transition {
+  transition: margin-left 300ms ease-in-out;
 }
