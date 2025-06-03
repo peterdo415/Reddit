@@ -37,8 +37,8 @@ const Sidebar: React.FC = () => {
       {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className={`fixed left-4 top-20 w-8 h-8 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 focus:outline-none lg:hidden z-50 transform transition-transform duration-300 ${
-          isSidebarOpen ? 'translate-x-56' : ''
+        className={`fixed left-2 top-20 w-8 h-8 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 focus:outline-none lg:hidden z-50 transform transition-transform duration-300 ${
+          isSidebarOpen ? 'translate-x-48' : ''
         }`}
         aria-label={isSidebarOpen ? 'サイドバーを閉じる' : 'サイドバーを開く'}
       >
@@ -46,8 +46,8 @@ const Sidebar: React.FC = () => {
       </button>
 
       {/* Vertical Line */}
-      <div className={`fixed left-8 top-14 h-[calc(100%-3.5rem)] border-l border-gray-200 lg:hidden transform transition-transform duration-300 ${
-        isSidebarOpen ? 'translate-x-56' : ''
+      <div className={`fixed left-6 top-14 h-[calc(100%-3.5rem)] border-l border-gray-200 lg:hidden transform transition-transform duration-300 ${
+        isSidebarOpen ? 'translate-x-48' : ''
       }`} />
 
       {/* Backdrop */}
@@ -60,7 +60,7 @@ const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed top-14 left-0 w-64 h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
+        className={`fixed top-14 left-0 w-48 h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

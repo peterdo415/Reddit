@@ -41,7 +41,7 @@ function App() {
         <div className="flex flex-grow relative">
           <Sidebar />
           <main className={`flex-grow p-4 transition-all duration-300 ease-in-out ${
-            isSidebarOpen ? 'lg:ml-64 transform translate-x-64 lg:translate-x-0' : ''
+            isSidebarOpen ? 'lg:ml-64 transform translate-x-48 lg:translate-x-0' : ''
           }`}>
             <Routes>
               <Route path="/" element={<HomePage />} />
