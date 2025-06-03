@@ -94,21 +94,33 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
             <ArrowBigUp size={24} />
           </button>
           
-          <span className={`text-sm font-medium my-1 ${
+          <div className={`relative flex items-center my-1 ${
             vote === 1 
               ? 'text-[var(--upvote)]' 
               : vote === -1 
                 ? 'text-[var(--downvote)]' 
                 : 'text-gray-700'
           }`}>
-            {post.upvotes_count - post.downvotes_count}
+            <span className="text-sm font-medium">
+              {post.upvotes_count - post.downvotes_count}
+            </span>
             {showFireEffect && (
-              <Flame 
-                size={14} 
-                className="inline-block ml-1 text-[var(--upvote)] animate-pulse-slow" 
-              />
+              <div className="absolute -right-6 animate-float">
+                <div className="relative">
+                  <Flame 
+                    size={16} 
+                    className="text-[var(--upvote)] animate-pulse-slow" 
+                  />
+                  <div className="absolute top-0 left-0 w-full h-full">
+                    <Flame 
+                      size={16} 
+                      className="text-[var(--upvote)] opacity-50 animate-pulse-reverse" 
+                    />
+                  </div>
+                </div>
+              </div>
             )}
-          </span>
+          </div>
           
           <button 
             onClick={handleDownvote}
