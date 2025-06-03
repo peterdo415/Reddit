@@ -60,7 +60,7 @@ const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed top-14 left-0 w-48 h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
+        className={`fixed top-14 left-0 w-[calc(48rem/8)] h-[calc(100vh-3.5rem)] bg-white lg:border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
