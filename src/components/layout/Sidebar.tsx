@@ -34,25 +34,25 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Toggle Button */}
-      <button
-        onClick={toggleSidebar}
-        className={`fixed left-2 top-20 w-8 h-8 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 focus:outline-none lg:hidden z-50 transform transition-transform duration-300 ${
-          isSidebarOpen ? 'translate-x-48' : ''
-        }`}
-        aria-label={isSidebarOpen ? 'サイドバーを閉じる' : 'サイドバーを開く'}
-      >
-        <Menu size={20} />
-      </button>
-
-      {/* Vertical Line */}
-      <div className={`fixed left-6 top-14 h-[calc(100%-3.5rem)] border-l border-gray-200 lg:hidden transform transition-transform duration-300 ${
+      {/* Toggle Button and Vertical Line Container */}
+      <div className={`fixed left-2 top-14 h-[calc(100%-3.5rem)] flex flex-col items-center lg:hidden transform transition-transform duration-300 ${
         isSidebarOpen ? 'translate-x-48' : ''
-      }`} />
+      }`}>
+        {/* Toggle Button */}
+        <button
+          onClick={toggleSidebar}
+          className="w-8 h-8 mt-6 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 focus:outline-none z-50"
+          aria-label={isSidebarOpen ? 'サイドバーを閉じる' : 'サイドバーを開く'}
+        >
+          <Menu size={20} />
+        </button>
+        {/* Vertical Line */}
+        <div className="w-px h-full bg-gray-200 mt-2" />
+      </div>
 
       {/* Sidebar */}
       <aside 
-        className={`fixed top-14 left-0 w-48 h-[calc(100vh-3.5rem)] bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
+        className={`fixed top-14 left-0 w-48 h-[calc(100vh-3.5rem)] bg-gray-100 transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
