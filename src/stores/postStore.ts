@@ -119,7 +119,7 @@ export const usePostStore = create<PostState>((set, get) => ({
         .from('communities')
         .select('id')
         .eq('name', communityName)
-        .single();
+        .maybeSingle();
         
       if (communityError) throw communityError;
       
@@ -164,7 +164,7 @@ export const usePostStore = create<PostState>((set, get) => ({
           )
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
         
       if (error) throw error;
       
@@ -203,7 +203,7 @@ export const usePostStore = create<PostState>((set, get) => ({
         .select('vote_type')
         .eq('user_id', user.id)
         .eq('post_id', postId)
-        .single();
+        .maybeSingle();
         
       // Handle vote logic
       if (existingVote) {
@@ -298,7 +298,7 @@ export const usePostStore = create<PostState>((set, get) => ({
         .select('vote_type')
         .eq('user_id', user.id)
         .eq('post_id', postId)
-        .single();
+        .maybeSingle();
         
       // Handle vote logic
       if (existingVote) {

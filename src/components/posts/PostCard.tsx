@@ -6,6 +6,7 @@ import { Post } from '../../lib/supabase';
 import { usePostStore } from '../../stores/postStore';
 import { useAuthStore } from '../../stores/authStore';
 import FireEffect from '../effects/FireEffect';
+import { supabase } from '../../lib/supabase';
 
 interface PostCardProps {
   post: Post;
@@ -19,48 +20,58 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
   
   // Get user's vote for this post
   useEffect(() => {
-    const fetchVote = async () => {
-      if (!user) return;
-      
-      const { data } = await supabase
-        .from('votes')
-        .select('vote_type')
-        .eq('user_id', user.id)
-        .eq('post_id', post.id)
-        .single();
-        
-      if (data) {
-        setVote(data.vote_type);
-      }
-    };
-    
     fetchVote();
+    // eslint-disable-next-line
   }, [post.id, user]);
   
-  const handleUpvote = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
+  const fetchVote = async () => {
     if (!user) {
-      alert('投票するにはログインが必要です');
+      setVote(0);
       return;
     }
-    
-    upvotePost(post.id);
-    setVote(vote === 1 ? 0 : 1);
+    const { data } = await supabase
+      .from('votes')
+      .select('vote_type')
+      .eq('user_id', user.id)
+      .eq('post_id', post.id)
+      .single();
+    if (data) {
+      setVote(data.vote_type);
+    } else {
+      setVote(0);
+    }
   };
   
-  const handleDownvote = (e: React.MouseEvent) => {
+  const handleUpvote = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
     if (!user) {
       alert('投票するにはログインが必要です');
       return;
     }
-    
-    downvotePost(post.id);
-    setVote(vote === -1 ? 0 : -1);
+    const optimistic = vote === 1 ? 0 : 1;
+    setVote(optimistic);
+    try {
+      await upvotePost(post.id);
+    } catch (err) {
+      fetchVote(); // 失敗時は正しい状態に戻す
+    }
+  };
+  
+  const handleDownvote = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      alert('投票するにはログインが必要です');
+      return;
+    }
+    const optimistic = vote === -1 ? 0 : -1;
+    setVote(optimistic);
+    try {
+      await downvotePost(post.id);
+    } catch (err) {
+      fetchVote();
+    }
   };
   
   // Check if this post should have fire effect (top 3 posts)
@@ -85,13 +96,18 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
         <div className="flex flex-col items-center mr-3">
           <button 
             onClick={handleUpvote}
+            title={vote === 1 ? 'アップボート済み' : 'アップボート'}
+            aria-pressed={vote === 1}
             className={`p-1 rounded-md ${
               vote === 1 
                 ? 'text-[var(--upvote)]' 
                 : 'text-gray-500 hover:text-[var(--upvote)] hover:bg-orange-50'
             }`}
           >
-            <ArrowBigUp size={24} />
+            <ArrowBigUp size={24} 
+              fill={vote === 1 ? 'var(--upvote)' : 'none'}
+              stroke={vote === 1 ? 'var(--upvote)' : 'currentColor'}
+            />
           </button>
           
           <span className={`text-sm font-medium my-1 ${
@@ -106,13 +122,18 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
           
           <button 
             onClick={handleDownvote}
+            title={vote === -1 ? 'ダウンボート済み' : 'ダウンボート'}
+            aria-pressed={vote === -1}
             className={`p-1 rounded-md ${
               vote === -1 
                 ? 'text-[var(--downvote)]' 
                 : 'text-gray-500 hover:text-[var(--downvote)] hover:bg-blue-50'
             }`}
           >
-            <ArrowBigDown size={24} />
+            <ArrowBigDown size={24} 
+              fill={vote === -1 ? 'var(--downvote)' : 'none'}
+              stroke={vote === -1 ? 'var(--downvote)' : 'currentColor'}
+            />
           </button>
         </div>
         

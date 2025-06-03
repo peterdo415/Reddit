@@ -72,7 +72,7 @@ export const useCommentStore = create<CommentState>((set, get) => ({
               .from('comments')
               .select('depth')
               .eq('id', comment.parent_comment_id)
-              .single()
+              .maybeSingle()
               .then(({ data }) => (data?.depth || 0) + 1)
             : 0
         })

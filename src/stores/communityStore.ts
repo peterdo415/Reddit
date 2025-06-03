@@ -81,7 +81,7 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
         .from('communities')
         .select('*')
         .eq('name', name)
-        .single();
+        .maybeSingle();
         
       if (error) throw error;
       
@@ -107,7 +107,7 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
           user_id: user.id
         })
         .select()
-        .single();
+        .maybeSingle();
         
       if (error) throw error;
       
