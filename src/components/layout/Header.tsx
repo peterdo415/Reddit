@@ -1,33 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, LogIn, User, PlusCircle, Menu, X } from 'lucide-react';
+import { Search, LogIn, User, PlusCircle, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
-import { useUiStore } from '../../stores/uiStore';
 
 const Header: React.FC = () => {
   const { user, logout } = useAuthStore();
-  const { isMenuOpen, toggleMenu, closeMenu } = useUiStore();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [showUserMenu, setShowUserMenu] = React.useState(false);
-
-  // Close menu on route change
-  useEffect(() => {
-    closeMenu();
-  }, [location.pathname, closeMenu]);
-
-  // Close menu on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closeMenu();
-        setShowUserMenu(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [closeMenu]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,8 +50,8 @@ const Header: React.FC = () => {
           </div>
         </form>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-4">
+        {/* User Menu */}
+        <div className="flex items-center">
           {user ? (
             <div className="relative">
               <button 
@@ -89,6 +69,7 @@ const Header: React.FC = () => {
                     <User size={20} className="text-gray-500" />
                   )}
                 </div>
+                <ChevronDown size={16} className="ml-1" />
               </button>
               
               {showUserMenu && (
@@ -143,102 +124,6 @@ const Header: React.FC = () => {
             </Link>
           )}
         </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={toggleMenu}
-          className="md:hidden p-2 text-gray-600 hover:text-gray-900 focus:outline-none"
-          aria-label="メニュー"
-        >
-          {isMenuOpen ? (
-            <X size={24} className="transition-transform duration-200 ease-in-out" />
-          ) : (
-            <Menu size={24} className="transition-transform duration-200 ease-in-out" />
-          )}
-        </button>
-
-        {/* Mobile Menu Overlay */}
-        {isMenuOpen && (
-          <>
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-              onClick={closeMenu}
-            />
-            <div className="fixed top-14 right-0 w-64 bg-white shadow-lg z-50 md:hidden transform transition-transform duration-200 ease-in-out">
-              <div className="py-2">
-                {user ? (
-                  <>
-                    <div className="px-4 py-3 border-b border-gray-200">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                          {user.user_metadata?.avatar_url ? (
-                            <img 
-                              src={user.user_metadata.avatar_url} 
-                              alt="User" 
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <User size={24} className="text-gray-500" />
-                          )}
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-700">
-                            {user.user_metadata?.username || user.email}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <Link 
-                      to="/profile" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={closeMenu}
-                    >
-                      プロフィール
-                    </Link>
-                    <Link 
-                      to="/create-post" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={closeMenu}
-                    >
-                      <span className="flex items-center">
-                        <PlusCircle size={16} className="mr-2" />
-                        投稿を作成
-                      </span>
-                    </Link>
-                    <Link 
-                      to="/community-selection" 
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={closeMenu}
-                    >
-                      コミュニティ選択
-                    </Link>
-                    <hr className="my-1" />
-                    <button 
-                      onClick={() => {
-                        handleLogout();
-                        closeMenu();
-                      }}
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      ログアウト
-                    </button>
-                  </>
-                ) : (
-                  <Link 
-                    to="/login" 
-                    className="block px-4 py-2 text-[var(--primary)] hover:bg-gray-100"
-                    onClick={closeMenu}
-                  >
-                    <span className="flex items-center">
-                      <LogIn size={18} className="mr-2" />
-                      ログイン
-                    </span>
-                  </Link>
-                )}
-              </div>
-            </div>
-          </>
-        )}
       </div>
       
       {/* Mobile Search */}

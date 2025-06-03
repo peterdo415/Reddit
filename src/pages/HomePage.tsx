@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import { usePostStore } from '../stores/postStore';
 import { useAuthStore } from '../stores/authStore';
+import { useUiStore } from '../stores/uiStore';
 import PostCard from '../components/posts/PostCard';
 import { useCommunityStore } from '../stores/communityStore';
 
@@ -9,6 +11,7 @@ const HomePage: React.FC = () => {
   const { posts, loading, hasMore, fetchPosts } = usePostStore();
   const { user, selectedCommunities } = useAuthStore();
   const { fetchCommunities } = useCommunityStore();
+  const { toggleMenu } = useUiStore();
   const navigate = useNavigate();
   
   // Check if user needs to select communities
@@ -43,7 +46,16 @@ const HomePage: React.FC = () => {
   
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-xl font-bold mb-4">トレンド投稿</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-bold">トレンド投稿</h1>
+        <button
+          onClick={toggleMenu}
+          className="md:hidden p-2 text-gray-600 hover:text-gray-900 focus:outline-none"
+          aria-label="メニュー"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
       
       {posts.length === 0 && !loading ? (
         <div className="bg-white rounded-lg shadow p-6 text-center">
