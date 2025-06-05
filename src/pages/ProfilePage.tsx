@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { User } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { supabase } from '../lib/supabase';
+import AvatarUploader from '../components/profile/AvatarUploader';
 
 interface ProfileFormData {
   username: string;
@@ -13,12 +13,13 @@ interface ProfileFormData {
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuthStore();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ProfileFormData>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<ProfileFormData>();
   
   // Load user profile data
   useEffect(() => {
@@ -38,7 +39,7 @@ const ProfilePage: React.FC = () => {
           setValue('username', data.username || '');
           setValue('bio', data.bio || '');
           setValue('profile_image_url', data.profile_image_url || '');
-          setImagePreview(data.profile_image_url);
+          setAvatarUrl(data.profile_image_url || null);
         }
       } catch (err: any) {
         console.error('Error loading profile:', err);
@@ -51,33 +52,44 @@ const ProfilePage: React.FC = () => {
   
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) return;
-    
     try {
       setLoading(true);
       setError(null);
-      
-      // Update profile
-      const { error } = await supabase
+      setSuccess(null);
+      let uploadedAvatarUrl = avatarUrl;
+      // 画像ファイルが選択されていればアップロード
+      if (avatarFile) {
+        const fileExt = avatarFile.name.split('.').pop();
+        const filePath = `avatars/${user.id}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, avatarFile, { upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+        uploadedAvatarUrl = publicUrlData?.publicUrl || null;
+      }
+      // プロフィール情報を更新
+      const { error: updateError } = await supabase
         .from('users')
         .update({
           username: data.username,
           bio: data.bio,
-          profile_image_url: data.profile_image_url,
+          profile_image_url: uploadedAvatarUrl,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
-        
-      if (error) throw error;
-      
-      // Update auth metadata
+      if (updateError) throw updateError;
+      // Auth metadataも更新
       await supabase.auth.updateUser({
         data: {
           username: data.username,
-          avatar_url: data.profile_image_url
+          avatar_url: uploadedAvatarUrl
         }
       });
-      
-      navigate('/');
+      setAvatarUrl(uploadedAvatarUrl);
+      setValue('profile_image_url', uploadedAvatarUrl || '');
+      setSuccess('プロフィールを保存しました');
+      setAvatarFile(null);
     } catch (err: any) {
       console.error('Error updating profile:', err);
       setError(err.message);
@@ -86,20 +98,9 @@ const ProfilePage: React.FC = () => {
     }
   };
   
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // Preview image
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-    
-    // TODO: Implement image upload to storage
-    // For now, just use a placeholder URL
-    setValue('profile_image_url', 'https://api.dicebear.com/7.x/avatars/svg?seed=' + Date.now());
+  // 画像ファイル選択時のコールバック
+  const handleAvatarFileSelect = (file: File | null) => {
+    setAvatarFile(file);
   };
   
   return (
@@ -113,38 +114,22 @@ const ProfilePage: React.FC = () => {
           </div>
         )}
         
+        {success && (
+          <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
+            {success}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Profile Image */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               プロフィール画像
             </label>
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                {imagePreview ? (
-                  <img 
-                    src={imagePreview} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User size={40} className="text-gray-400" />
-                )}
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-                id="profile-image"
-              />
-              <label
-                htmlFor="profile-image"
-                className="bg-white text-[var(--primary)] border border-[var(--primary)] px-4 py-2 rounded-md hover:bg-[var(--primary)] hover:text-white transition-colors cursor-pointer"
-              >
-                画像を選択
-              </label>
-            </div>
+            <AvatarUploader
+              avatarUrl={avatarUrl}
+              onFileSelect={handleAvatarFileSelect}
+            />
           </div>
           
           {/* Username */}
