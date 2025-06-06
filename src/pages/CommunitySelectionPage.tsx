@@ -4,6 +4,8 @@ import { Search, Plus } from 'lucide-react';
 import { useCommunityStore } from '../stores/communityStore';
 import { useAuthStore } from '../stores/authStore';
 import { Community } from '../lib/supabase';
+import ImageUploader from '../components/profile/AvatarUploader';
+import { supabase } from '../lib/supabase';
 
 const CommunitySelectionPage: React.FC = () => {
   const { 
@@ -313,8 +315,34 @@ export const CommunityCreateForm: React.FC<{
   const [newCommunityName, setNewCommunityName] = useState('');
   const [newCommunityDisplayName, setNewCommunityDisplayName] = useState('');
   const [newCommunityDescription, setNewCommunityDescription] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // 画像アップロード処理
+  const uploadImage = async (file: File, communityName: string): Promise<string | null> => {
+    const ext = file.name.split('.').pop();
+    const filePath = `${communityName}/${Date.now()}.${ext}`;
+    setUploading(true);
+    const { data, error } = await supabase.storage
+      .from('community-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+      });
+    setUploading(false);
+    if (error) {
+      setError('画像のアップロードに失敗しました');
+      return null;
+    }
+    // 画像の公開URLを取得
+    const { data: publicUrlData } = supabase.storage
+      .from('community-images')
+      .getPublicUrl(filePath);
+    return publicUrlData?.publicUrl || null;
+  };
 
   const handleCreateCommunity = async () => {
     if (!newCommunityName || !newCommunityDisplayName) {
@@ -325,19 +353,26 @@ export const CommunityCreateForm: React.FC<{
       setError('コミュニティ名は英小文字、数字、アンダースコアのみ使用できます');
       return;
     }
+    let uploadedImageUrl: string | null = null;
+    if (imageFile) {
+      uploadedImageUrl = await uploadImage(imageFile, newCommunityName);
+      if (!uploadedImageUrl) return;
+    }
     try {
       const newCommunity = await createCommunity({
         name: newCommunityName,
         display_name: newCommunityDisplayName,
-        description: newCommunityDescription
+        description: newCommunityDescription,
+        image_url: uploadedImageUrl || null,
       });
       if (newCommunity) {
         setNewCommunityName('');
         setNewCommunityDisplayName('');
         setNewCommunityDescription('');
+        setImageFile(null);
+        setImageUrl(null);
         setError('');
         if (onCreated) onCreated(newCommunity);
-        // デフォルトはコミュニティページへ遷移
         else navigate(`/c/${newCommunity.name}`);
       }
     } catch (err: any) {
@@ -388,6 +423,19 @@ export const CommunityCreateForm: React.FC<{
           placeholder="コミュニティの説明"
         />
       </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          コミュニティ画像 (5MB以下/JPEG/PNG)
+        </label>
+        <ImageUploader
+          imageUrl={imageUrl}
+          onFileSelect={file => setImageFile(file)}
+          defaultImageUrl="/default-community.png"
+          alt="コミュニティ画像"
+          buttonLabel="画像を変更"
+        />
+        {uploading && <p className="text-blue-500 text-sm mt-2">画像をアップロード中...</p>}
+      </div>
       <div className="flex justify-end space-x-3">
         <button
           onClick={() => navigate(-1)}
@@ -398,6 +446,7 @@ export const CommunityCreateForm: React.FC<{
         <button
           onClick={handleCreateCommunity}
           className="px-4 py-2 bg-[var(--primary)] text-white rounded-md hover:bg-[var(--primary-hover)]"
+          disabled={uploading}
         >
           作成
         </button>

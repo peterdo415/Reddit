@@ -119,9 +119,11 @@ const Sidebar: React.FC = () => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-xs font-bold">
-                          {community.display_name.charAt(0).toUpperCase()}
-                        </span>
+                        <img 
+                          src="/default-community.png" 
+                          alt={community.display_name} 
+                          className="w-full h-full object-cover"
+                        />
                       )}
                     </div>
                     <span className="truncate">{community.display_name}</span>

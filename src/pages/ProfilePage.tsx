@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '../stores/authStore';
 import { supabase } from '../lib/supabase';
-import AvatarUploader from '../components/profile/AvatarUploader';
+import ImageUploader from '../components/profile/AvatarUploader';
 
 interface ProfileFormData {
   username: string;
@@ -126,9 +126,12 @@ const ProfilePage: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               プロフィール画像
             </label>
-            <AvatarUploader
-              avatarUrl={avatarUrl}
+            <ImageUploader
+              imageUrl={avatarUrl}
               onFileSelect={handleAvatarFileSelect}
+              defaultImageUrl="/default-avatar.png"
+              alt="プロフィール画像"
+              buttonLabel="画像を変更"
             />
           </div>
           

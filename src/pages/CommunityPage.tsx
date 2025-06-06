@@ -60,11 +60,11 @@ const CommunityPage: React.FC = () => {
               className="w-16 h-16 rounded-full mr-4"
             />
           ) : (
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-              <span className="text-2xl font-bold text-gray-600">
-                {community.display_name.charAt(0).toUpperCase()}
-              </span>
-            </div>
+            <img 
+              src="/default-community.png" 
+              alt={community.display_name}
+              className="w-16 h-16 rounded-full mr-4 object-cover"
+            />
           )}
           
           <div>
