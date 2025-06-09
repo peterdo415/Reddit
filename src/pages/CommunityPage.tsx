@@ -8,19 +8,23 @@ import { useAuthStore } from '../stores/authStore';
 import CommunityEditModal from '../components/community/CommunityEditModal';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const CommunityPage: React.FC = () => {
   const { communityName } = useParams<{ communityName: string }>();
-  const { fetchCommunityByName } = useCommunityStore();
+  const { fetchCommunityByName, fetchCommunities } = useCommunityStore();
   const { posts, loading, hasMore, fetchPostsByCommunity } = usePostStore();
   const [community, setCommunity] = useState<Community | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuthStore();
+  const { user, selectedCommunities, setSelectedCommunities } = useAuthStore();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
   const navigate = useNavigate();
+  const [joining, setJoining] = useState(false);
   
   useEffect(() => {
     const loadCommunity = async () => {
@@ -97,6 +101,50 @@ const CommunityPage: React.FC = () => {
               >
                 削除
               </button>
+            </div>
+          )}
+          {user && community.user_id !== user.id && (
+            <div className="ml-4">
+              {selectedCommunities.includes(community.id) ? (
+                <button
+                  className="px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300"
+                  disabled={joining}
+                  onClick={async () => {
+                    setJoining(true);
+                    try {
+                      const newIds = selectedCommunities.filter(id => id !== community.id);
+                      setSelectedCommunities(newIds);
+                      await fetchCommunities();
+                      toast.success('コミュニティを脱退しました');
+                    } catch (e) {
+                      toast.error('脱退に失敗しました');
+                    } finally {
+                      setJoining(false);
+                    }
+                  }}
+                >
+                  脱退
+                </button>
+              ) : (
+                <button
+                  className="px-3 py-1 text-sm rounded-md bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] border border-[var(--primary)]"
+                  disabled={joining}
+                  onClick={async () => {
+                    setJoining(true);
+                    try {
+                      const newIds = [...selectedCommunities, community.id];
+                      setSelectedCommunities(newIds);
+                      toast.success('コミュニティに参加しました');
+                    } catch (e) {
+                      toast.error('参加に失敗しました');
+                    } finally {
+                      setJoining(false);
+                    }
+                  }}
+                >
+                  参加
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -196,6 +244,8 @@ const CommunityPage: React.FC = () => {
           </div>
         </div>
       )}
+      
+      <ToastContainer position="top-center" autoClose={2000} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss={false} pauseOnHover={false} />
     </div>
   );
 };
