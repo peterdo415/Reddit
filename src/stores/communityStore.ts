@@ -13,6 +13,7 @@ interface CommunityState {
   fetchCommunityByName: (name: string) => Promise<Community | null>;
   createCommunity: (community: Partial<Community>) => Promise<Community | null>;
   searchCommunities: (query: string) => Promise<Community[]>;
+  fetchAllCommunities: () => Promise<void>;
 }
 
 export const useCommunityStore = create<CommunityState>((set, get) => ({
@@ -153,6 +154,24 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
     } catch (error) {
       console.error('Error searching communities:', error);
       return [];
+    }
+  },
+
+  fetchAllCommunities: async () => {
+    try {
+      set({ loading: true, error: null });
+      const { data, error } = await supabase
+        .from('communities')
+        .select('*')
+        .order('member_count', { ascending: false });
+      if (error) throw error;
+      set({
+        communities: data || [],
+        loading: false
+      });
+    } catch (error: any) {
+      set({ loading: false, error: error.message });
+      console.error('Error fetching all communities:', error);
     }
   }
 }));

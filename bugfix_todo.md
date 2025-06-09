@@ -9,6 +9,9 @@
     - Supabase側で全投稿のcomments_countを再集計SQLで一括修正
     - コメント追加・削除時にupdate_comments_count関数（Supabase Function）を必ず呼ぶよう徹底
     - post_hot_scoresビューもcomments_countを必ず含めるよう修正
+- [ ] 新規投稿時、DBに存在する全てのコミュニティから選択できるようにする（現在は所属コミュニティのみ選択可能）
+    - デフォルトで所属コミュニティをサジェスト表示
+    - 残りのコミュニティは検索で選択可能に（1文字入力ごとに検索、本家Redditと同じUI/仕様）
 
 ---
 
