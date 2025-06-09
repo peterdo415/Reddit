@@ -5,6 +5,10 @@
 ## バグ修正タスク
 - [x] testユーザーでログイン後には表示される投稿が、画面更新したら投稿が表示されなくなる問題を修正
 - [x] ログイン後にサイドバーに所属コミュニティが反映されない問題を修正（更新処理が必要）
+- [x] 投稿のコメント数（comments_count）がDBと画面でズレる問題を修正
+    - Supabase側で全投稿のcomments_countを再集計SQLで一括修正
+    - コメント追加・削除時にupdate_comments_count関数（Supabase Function）を必ず呼ぶよう徹底
+    - post_hot_scoresビューもcomments_countを必ず含めるよう修正
 
 ---
 

@@ -9,6 +9,7 @@ interface CommentState {
   fetchCommentsByPostId: (postId: string) => Promise<void>;
   createComment: (comment: Partial<Comment>) => Promise<Comment | null>;
   buildCommentTree: (comments: Comment[]) => Comment[];
+  deleteComment: (commentId: string) => Promise<boolean>;
 }
 
 export const useCommentStore = create<CommentState>((set, get) => ({
@@ -87,14 +88,9 @@ export const useCommentStore = create<CommentState>((set, get) => ({
         
       if (error) throw error;
       
-      // Increment post comment count
+      // コメント追加時、posts.comments_countを+1
       if (comment.post_id) {
-        await supabase
-          .from('posts')
-          .update({
-            comments_count: supabase.rpc('increment', { x: 1 })
-          })
-          .eq('id', comment.post_id);
+        await supabase.rpc('update_comments_count', { postid: comment.post_id });
       }
       
       // Format comment
@@ -165,5 +161,39 @@ export const useCommentStore = create<CommentState>((set, get) => ({
     });
     
     return rootComments;
+  },
+
+  // コメント削除（論理削除）＋コメント数デクリメント
+  deleteComment: async (commentId: string) => {
+    const { user } = useAuthStore.getState();
+    if (!user) return false;
+    try {
+      // コメント取得
+      const { data: comment, error: fetchError } = await supabase
+        .from('comments')
+        .select('id, post_id')
+        .eq('id', commentId)
+        .maybeSingle();
+      if (fetchError || !comment) throw fetchError || new Error('コメントが見つかりません');
+
+      // 論理削除
+      const { error: updateError } = await supabase
+        .from('comments')
+        .update({ is_deleted: true, body: 'このコメントは削除されました' })
+        .eq('id', commentId);
+      if (updateError) throw updateError;
+
+      // コメント削除時、posts.comments_countを再集計
+      await supabase.rpc('update_comments_count', { postid: comment.post_id });
+
+      // ローカル状態からも削除
+      set({
+        comments: get().comments.filter(c => c.id !== commentId)
+      });
+      return true;
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      return false;
+    }
   }
 }));

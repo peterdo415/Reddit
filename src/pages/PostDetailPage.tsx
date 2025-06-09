@@ -52,7 +52,8 @@ const PostDetailPage: React.FC = () => {
         parent_comment_id: replyTo?.id || null,
         body: newComment.trim()
       });
-      
+      const updatedPost = await fetchPostById(post.id);
+      if (updatedPost) setPost(updatedPost);
       setNewComment('');
       setReplyTo(null);
     } catch (err) {
@@ -140,7 +141,7 @@ const PostDetailPage: React.FC = () => {
           </div>
           <div className="flex items-center">
             <MessageSquare size={16} className="mr-1" />
-            <span>{post.comments_count} コメント</span>
+            <span>{typeof post.comments_count === 'number' ? post.comments_count : 0} コメント</span>
           </div>
         </div>
       </div>

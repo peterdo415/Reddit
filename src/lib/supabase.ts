@@ -86,6 +86,7 @@ export type Comment = {
   depth: number;
   created_at: string;
   updated_at: string;
+  is_deleted?: boolean;
   // Join fields
   username?: string | null;
   profile_image_url?: string | null;

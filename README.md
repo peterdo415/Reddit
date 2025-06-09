@@ -370,6 +370,21 @@ left join users u on p.user_id = u.id
 where p.is_promoted = false;
 ```
 
+### 5.8 コメント数キャッシュ再集計SQL（Reddit本家仕様）
+
+- コメント数は「親コメント・返信コメントすべて（is_deleted=falseのみ）」をカウントします。
+- postsテーブルのcomments_countカラムは、下記の関数で再集計できます。
+
+```sql
+-- 1投稿のみ再集計
+select update_comments_count('<POST_ID>');
+
+-- 全投稿一括再集計
+update posts set comments_count = (
+  select count(*) from comments where post_id = posts.id and is_deleted = false
+);
+```
+
 ---
 
 ## 6. Hot アルゴリズム運用フロー

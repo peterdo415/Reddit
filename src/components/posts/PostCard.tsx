@@ -212,7 +212,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, index }) => {
           <div className="flex items-center text-sm text-gray-500">
             <div className="flex items-center mr-4">
               <MessageSquare size={16} className="mr-1" />
-              <span>{post.comments_count} コメント</span>
+              <span>{typeof post.comments_count === 'number' ? post.comments_count : 0} コメント</span>
             </div>
             
             {post.is_promoted && (

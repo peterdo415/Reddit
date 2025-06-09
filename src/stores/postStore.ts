@@ -57,7 +57,10 @@ export const usePostStore = create<PostState>((set, get) => ({
       // Get regular posts
       let query = supabase
         .from('post_hot_scores')
-        .select('*')
+        .select(`
+          *,
+          comments_count
+        `)
         .order('hot_score', { ascending: false })
         .eq('is_promoted', false)
         .range(newOffset, newOffset + POSTS_PER_PAGE - 1);
@@ -126,7 +129,10 @@ export const usePostStore = create<PostState>((set, get) => ({
       // Get regular posts
       const { data: posts, error } = await supabase
         .from('post_hot_scores')
-        .select('*')
+        .select(`
+          *,
+          comments_count
+        `)
         .eq('community_id', community.id)
         .eq('is_promoted', false)
         .order('hot_score', { ascending: false })
@@ -153,6 +159,7 @@ export const usePostStore = create<PostState>((set, get) => ({
         .from('posts')
         .select(`
           *,
+          comments_count,
           communities!inner (
             name,
             display_name,
