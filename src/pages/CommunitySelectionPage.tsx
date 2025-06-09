@@ -72,12 +72,17 @@ const CommunitySelectionPage: React.FC = () => {
   const handleCreateCommunity = async () => {
     // Validate
     if (!newCommunityName || !newCommunityDisplayName) {
-      setError('コミュニティ名と表示名は必須です');
+      setError('コミュニティ名（URL用）と表示名は必須です');
       return;
     }
     
     if (!/^[a-z0-9_]+$/.test(newCommunityName)) {
-      setError('コミュニティ名は英小文字、数字、アンダースコアのみ使用できます');
+      setError('コミュニティ名（URL用）は英小文字・数字・アンダースコアのみ使用できます');
+      return;
+    }
+    
+    if (newCommunityDisplayName.length > 32) {
+      setError('表示名は32文字以内で入力してください');
       return;
     }
     
@@ -149,7 +154,7 @@ const CommunitySelectionPage: React.FC = () => {
             
             <div className="mb-3">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                コミュニティ名 (URL用、英小文字・数字・アンダースコアのみ)
+                コミュニティ名（URL用、英小文字・数字・アンダースコアのみ）
               </label>
               <input
                 id="name"
@@ -163,7 +168,7 @@ const CommunitySelectionPage: React.FC = () => {
             
             <div className="mb-3">
               <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">
-                表示名
+                表示名（日本語・多言語可、32文字以内）
               </label>
               <input
                 id="displayName"
@@ -346,11 +351,15 @@ export const CommunityCreateForm: React.FC<{
 
   const handleCreateCommunity = async () => {
     if (!newCommunityName || !newCommunityDisplayName) {
-      setError('コミュニティ名と表示名は必須です');
+      setError('コミュニティ名（URL用）と表示名は必須です');
       return;
     }
     if (!/^[a-z0-9_]+$/.test(newCommunityName)) {
-      setError('コミュニティ名は英小文字、数字、アンダースコアのみ使用できます');
+      setError('コミュニティ名（URL用）は英小文字・数字・アンダースコアのみ使用できます');
+      return;
+    }
+    if (newCommunityDisplayName.length > 32) {
+      setError('表示名は32文字以内で入力してください');
       return;
     }
     let uploadedImageUrl: string | null = null;
@@ -386,7 +395,7 @@ export const CommunityCreateForm: React.FC<{
       {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
       <div className="mb-3">
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-          コミュニティ名 (URL用、英小文字・数字・アンダースコアのみ)
+          コミュニティ名（URL用、英小文字・数字・アンダースコアのみ）
         </label>
         <input
           id="name"
@@ -399,7 +408,7 @@ export const CommunityCreateForm: React.FC<{
       </div>
       <div className="mb-3">
         <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">
-          表示名
+          表示名（日本語・多言語可、32文字以内）
         </label>
         <input
           id="displayName"

@@ -230,7 +230,7 @@ const CreatePostPage: React.FC = () => {
                 }}
                 onFocus={() => setShowDropdown(true)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search or select a community..."
+                placeholder="コミュニティ名（日本語可）で検索..."
                 className="flex-1 outline-none bg-transparent"
                 autoComplete="off"
               />

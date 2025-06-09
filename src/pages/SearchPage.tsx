@@ -64,7 +64,7 @@ const SearchPage: React.FC = () => {
           {/* Communities results */}
           {communities.length > 0 && (
             <div className="mb-8">
-              <h2 className="text-lg font-semibold mb-3">コミュニティ</h2>
+              <h2 className="text-lg font-semibold mb-3">コミュニティ（日本語対応）</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {communities.map(community => (
                   <div 

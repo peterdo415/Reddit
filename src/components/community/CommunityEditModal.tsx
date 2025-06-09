@@ -43,6 +43,10 @@ const CommunityEditModal: React.FC<CommunityEditModalProps> = ({ community, onCl
 
   const handleSave = async () => {
     setError('');
+    if (displayName.length > 32) {
+      setError('表示名は32文字以内で入力してください');
+      return;
+    }
     setSaving(true);
     let uploadedImageUrl = imageUrl;
     if (imageFile) {
@@ -93,12 +97,13 @@ const CommunityEditModal: React.FC<CommunityEditModalProps> = ({ community, onCl
           />
         </div>
         <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">表示名</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">表示名（日本語・多言語可、32文字以内）</label>
           <input
             type="text"
             value={displayName}
             onChange={e => setDisplayName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+            maxLength={32}
           />
         </div>
         <div className="mb-3">
