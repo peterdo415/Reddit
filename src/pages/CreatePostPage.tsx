@@ -59,6 +59,7 @@ const CreatePostPage: React.FC = () => {
       setSuggestedCommunities(data);
     };
     fetchSuggested();
+    setShowDropdown(true);
   }, [selectedCommunities]);
   
   useEffect(() => {
