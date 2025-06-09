@@ -149,12 +149,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (data.user) {
         const { error: profileError } = await supabase
           .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            username: username
-          });
-          
+          .upsert([
+            {
+              id: data.user.id,
+              email: data.user.email,
+              username: username
+            }
+          ], { onConflict: 'id' });
         if (profileError) throw profileError;
       }
       
