@@ -12,7 +12,7 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    if (initialized && user) {
+    if (initialized) {
       fetchCommunities();
     }
   }, [initialized, user, fetchCommunities]);
